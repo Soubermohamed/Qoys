@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qoys — Rencontres pour un mariage sérieux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --ink: #14312F;
+    --ink-soft: #2C5652;
+    --sand: #F4ECDA;
+    --sand-deep: #E9DEC2;
+    --paper: #FBF8F1;
+    --gold: #C79A5D;
+    --wine: #8B4049;
+    --wine-soft: #B96b6f;
+    --line: rgba(20,49,47,0.14);
+    --text: #1D2E2C;
+    --text-soft: #5B6E6A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--sand);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,.serif{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  ::selection{ background: var(--gold); color: var(--ink); }
+
+  /* ---------- Layout shells ---------- */
+  .app{ min-height:100vh; display:flex; flex-direction:column; }
+  .wrap{ max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  .wrap-wide{ max-width: 1040px; margin:0 auto; padding: 0 24px; }
+
+  header.site{
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+    background: var(--sand);
+    position: sticky; top:0; z-index: 20;
+  }
+  .site-row{ display:flex; align-items:center; justify-content:space-between; }
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand-mark{
+    width: 34px; height:34px; border-radius: 9px;
+    background: var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--sand); font-family:'Fraunces',serif; font-size:17px;
+    flex-shrink:0;
+  }
+  .brand-name{ font-family:'Fraunces',serif; font-size: 21px; color: var(--ink); }
+  .brand-tag{ font-size: 13px; color: var(--text-soft); display:none; }
+  @media(min-width:640px){ .brand-tag{ display:inline; } }
+
+  .nav-cta{
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background .18s ease, color .18s ease;
+  }
+  .nav-cta:hover{ background: var(--ink); color: var(--sand); }
+
+  main{ flex:1; }
+
+  /* ---------- Landing ---------- */
+  .hero{
+    background: var(--ink);
+    color: var(--sand);
+    padding: 88px 0 110px;
+    position: relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; right:-120px; bottom:-160px;
+    width: 420px; height:420px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, var(--wine) 0%, transparent 70%);
+    opacity:.55;
+  }
+  .hero-inner{ position:relative; z-index:1; max-width: 620px; }
+  .eyebrow-plain{
+    font-size: 14px; color: var(--gold); margin: 0 0 18px;
+  }
+  .hero h1{
+    font-size: clamp(34px, 5vw, 50px);
+    line-height: 1.12;
+    margin: 0 0 22px;
+    color: var(--sand);
+  }
+  .hero p{
+    font-size: 17px;
+    color: #D9D0BC;
+    max-width: 480px;
+    margin: 0 0 34px;
+  }
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn-primary{
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 14px 26px;
+    border-radius: 999px;
+    font-size: 15.5px;
+    font-weight: 600;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-1px); box-shadow: 0 8px 22px rgba(199,154,93,0.35); }
+  .btn-ghost{
+    background: transparent;
+    border: 1px solid rgba(244,236,218,0.4);
+    color: var(--sand);
+    padding: 14px 22px;
+    border-radius: 999px;
+    font-size: 15.5px;
+  }
+  .hero-stats{
+    display:flex; gap: 34px; margin-top: 54px; flex-wrap:wrap;
+  }
+  .hero-stat b{ font-family:'Fraunces',serif; font-size: 26px; display:block; color: var(--sand); font-weight:500; }
+  .hero-stat span{ font-size: 13px; color:#C7BEA9; }
+
+  .steps{
+    padding: 78px 0 90px;
+  }
+  .steps h2{ font-size: 28px; margin: 0 0 10px; }
+  .steps > .wrap > p{ color: var(--text-soft); max-width: 480px; margin: 0 0 46px; font-size: 15.5px; }
+  .step-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+  @media(max-width: 780px){ .step-grid{ grid-template-columns: 1fr; } }
+  .step-card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 26px 24px;
+  }
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-size: 15px;
+    color: var(--wine);
+    margin-bottom: 14px;
+  }
+  .step-card h3{ font-size: 18px; margin: 0 0 8px; }
+  .step-card p{ font-size: 14.5px; color: var(--text-soft); margin:0; }
+
+  .principles{
+    background: var(--sand-deep);
+    padding: 70px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .principles-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items:start; }
+  @media(max-width:780px){ .principles-row{ grid-template-columns: 1fr; } }
+  .principles h2{ font-size: 26px; max-width: 360px; }
+  .principle-list{ display:flex; flex-direction:column; gap: 22px; }
+  .principle-item{ display:flex; gap:16px; }
+  .principle-dot{
+    width: 8px; height:8px; border-radius:50%; background: var(--wine);
+    margin-top: 8px; flex-shrink:0;
+  }
+  .principle-item h4{ margin:0 0 4px; font-size:16px; font-family:'Fraunces',serif; font-weight:500; color:var(--ink); }
+  .principle-item p{ margin:0; font-size: 14.5px; color: var(--text-soft); }
+
+  .cta-band{
+    padding: 80px 0;
+    text-align:center;
+  }
+  .cta-band h2{ font-size: 30px; margin: 0 0 14px; }
+  .cta-band p{ color: var(--text-soft); margin: 0 0 30px; }
+
+  footer.site{
+    border-top: 1px solid var(--line);
+    padding: 26px 0;
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+  .footer-row{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+
+  /* ---------- Quiz ---------- */
+  .quiz-shell{ padding: 54px 0 90px; }
+  .quiz-head{ margin-bottom: 36px; }
+  .quiz-head h2{ font-size: 24px; margin: 0 0 6px; }
+  .quiz-head p{ color: var(--text-soft); font-size: 14.5px; margin:0; }
+
+  .progress-track{
+    display:flex; gap:8px; margin: 26px 0 40px;
+  }
+  .progress-seg{
+    height: 4px; flex:1; border-radius: 3px; background: var(--sand-deep);
+    overflow:hidden;
+  }
+  .progress-seg i{
+    display:block; height:100%; width:0%; background: var(--wine);
+    transition: width .35s ease;
+  }
+  .progress-label{ font-size: 13px; color: var(--text-soft); margin-bottom: 4px; }
+
+  .cat-tag{
+    display:inline-block; font-size: 12.5px; color: var(--wine);
+    background: rgba(139,64,73,0.08);
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 18px;
+  }
+
+  .question-card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 34px 30px;
+  }
+  .question-card h3{ font-size: 21px; margin: 0 0 24px; line-height:1.35; }
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .option{
+    display:flex; align-items:center; gap: 13px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 14px 16px;
+    background: var(--sand);
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .option:hover{ border-color: var(--gold); }
+  .option.selected{ border-color: var(--wine); background: rgba(139,64,73,0.06); }
+  .option input{ accent-color: var(--wine); width:16px; height:16px; flex-shrink:0; }
+  .option label{ font-size: 15px; cursor:pointer; flex:1; }
+
+  .quiz-nav{ display:flex; justify-content:space-between; margin-top: 30px; }
+  .btn-plain{
+    background: transparent; border: none; color: var(--text-soft);
+    font-size: 14.5px; padding: 10px 4px;
+  }
+  .btn-plain:hover{ color: var(--ink); }
+  .btn-primary:disabled{ opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  /* ---------- Forms (auth & profile info) ---------- */
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size: 13.5px; color: var(--text-soft); }
+  .field input, .field textarea{
+    width:100%; padding: 13px 14px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--sand);
+    font-size: 15px; font-family: inherit; color: var(--text);
+  }
+  .field textarea{ resize: vertical; min-height: 80px; }
+  .field input:focus, .field textarea:focus{ outline: none; border-color: var(--gold); }
+  .form-error{ color: var(--wine); font-size: 13.5px; display:none; }
+  .form-note{ text-align:center; }
+  .empty-state{
+    grid-column: 1 / -1;
+    background: var(--paper);
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+    padding: 34px 26px;
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 14.5px;
+  }
+
+  .auth-tabs{ display:flex; gap:8px; margin-bottom: 24px; }
+  .auth-tab{
+    flex:1; padding: 11px 0; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--sand);
+    color: var(--text-soft); font-size: 14.5px; font-weight:500;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .auth-tab.active{ background: var(--ink); color: var(--sand); border-color: var(--ink); }
+
+  /* ---------- Results ---------- */
+  .results-shell{ padding: 50px 0 100px; }
+  .results-head h2{ font-size: 26px; margin: 0 0 8px; }
+  .results-head p{ color: var(--text-soft); font-size: 14.5px; margin: 0 0 36px; }
+
+  .match-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media(max-width: 720px){ .match-grid{ grid-template-columns: 1fr; } }
+
+  .match-card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px;
+    display:flex; flex-direction:column; gap:14px;
+    cursor:pointer;
+    transition: border-color .15s ease;
+  }
+  .match-card:hover{ border-color: var(--gold); }
+  .match-top{ display:flex; gap:14px; align-items:center; }
+  .avatar{
+    width: 54px; height:54px; border-radius: 50%;
+    background: var(--ink); color: var(--sand);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-size:18px; flex-shrink:0;
+  }
+  .match-name{ font-family:'Fraunces',serif; font-size:18px; color:var(--ink); margin:0; }
+  .match-meta{ font-size: 13.5px; color: var(--text-soft); margin: 2px 0 0; }
+  .match-score{ margin-left:auto; text-align:right; }
+  .match-score b{ font-family:'Fraunces',serif; font-size:22px; color: var(--wine); display:block; }
+  .match-score span{ font-size: 11.5px; color: var(--text-soft); }
+
+  .score-bar{ height:5px; border-radius:3px; background: var(--sand-deep); overflow:hidden; }
+  .score-bar i{ display:block; height:100%; background: var(--wine); }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap:7px; }
+  .tag{
+    font-size: 12px; color: var(--ink-soft);
+    background: var(--sand-deep);
+    padding: 5px 10px; border-radius: 999px;
+  }
+
+  /* ---------- Detail modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background: rgba(20,49,47,0.55);
+    display:flex; align-items:flex-end; justify-content:center;
+    z-index: 50; padding: 0;
+  }
+  @media(min-width:640px){ .overlay{ align-items:center; padding: 24px; } }
+  .modal{
+    background: var(--paper);
+    width: 100%; max-width: 520px;
+    border-radius: 20px 20px 0 0;
+    padding: 30px 26px 34px;
+    max-height: 88vh; overflow-y:auto;
+  }
+  @media(min-width:640px){ .modal{ border-radius: 20px; } }
+  .modal-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 18px; }
+  .modal-close{ background:none; border:none; font-size: 22px; color: var(--text-soft); line-height:1; }
+  .modal h3{ font-size: 22px; margin: 0 0 4px; }
+  .modal .match-meta{ margin-bottom: 18px; }
+  .modal-section{ margin-bottom: 20px; }
+  .modal-section h4{ font-family:'Fraunces',serif; font-size:14.5px; font-weight:500; color: var(--wine); margin: 0 0 8px; }
+  .modal-section p{ font-size: 14.5px; color: var(--text); margin:0; }
+
+  .toast{
+    position: fixed; bottom: 26px; left:50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--sand);
+    padding: 13px 22px; border-radius: 999px; font-size: 14px;
+    z-index: 80; opacity:0; pointer-events:none; transition: opacity .25s ease, transform .25s ease;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(-6px); }
+
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="site">
+    <div class="wrap-wide site-row">
+      <div class="brand">
+        <div class="brand-mark">Q</div>
+        <div>
+          <div class="brand-name">Qoys</div>
+        </div>
+        <span class="brand-tag">· rencontres pour un mariage sérieux</span>
+      </div>
+      <button class="nav-cta" id="navCta">Faire le questionnaire</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== LANDING ===================== -->
+    <section id="screen-landing">
+      <div class="hero">
+        <div class="wrap-wide hero-inner">
+          <p class="eyebrow-plain">Fait pour un projet sérieux, pas pour discuter sans but</p>
+          <h1>Avant de se plaire, encore faut-il être compatibles.</h1>
+          <p>Qoys fait répondre chaque personne à un même questionnaire approfondi sur les valeurs, la famille et le mode de vie, puis ne présente que les profils réellement alignés avec le vôtre.</p>
+          <div class="hero-actions">
+            <button class="btn-primary" id="heroStart">Commencer le questionnaire</button>
+            <button class="btn-ghost" id="heroHow">Voir comment ça marche</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><b>24</b><span>questions de fond</span></div>
+            <div class="hero-stat"><b>8</b><span>domaines de compatibilité</span></div>
+            <div class="hero-stat"><b>100%</b><span>profils vérifiés à la main</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps" id="how">
+        <div class="wrap-wide">
+          <h2>Comment ça marche</h2>
+          <p>Trois étapes, sans messagerie infinie ni profils qui ne mènent nulle part.</p>
+          <div class="step-grid">
+            <div class="step-card">
+              <div class="step-num">Étape 1</div>
+              <h3>Répondre honnêtement</h3>
+              <p>Un questionnaire structuré sur vos valeurs, votre rapport à la famille et votre caractère au quotidien — pas de questions superflues.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">Étape 2</div>
+              <h3>Recevoir des profils compatibles</h3>
+              <p>Le calcul de compatibilité compare vos réponses à celles des autres membres et classe les profils par affinité réelle.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">Étape 3</div>
+              <h3>Échanger avec une intention claire</h3>
+              <p>Vous savez déjà pourquoi vous êtes compatibles avant même le premier message.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="principles">
+        <div class="wrap-wide principles-row">
+          <h2>Pensé pour un mariage, pas pour un fil de discussion</h2>
+          <div class="principle-list">
+            <div class="principle-item">
+              <div class="principle-dot"></div>
+              <div><h4>Des questions qui comptent vraiment</h4><p>Famille, valeurs, ambitions, rapport à la religion et à la culture — les sujets qu'on aborde en général bien trop tard.</p></div>
+            </div>
+            <div class="principle-item">
+              <div class="principle-dot"></div>
+              <div><h4>Un score de compatibilité expliqué</h4><p>Chaque mise en relation indique sur quels points vous vous rejoignez, pas seulement un pourcentage.</p></div>
+            </div>
+            <div class="principle-item">
+              <div class="principle-dot"></div>
+              <div><h4>Peu de profils, bien choisis</h4><p>Mieux vaut cinq profils pertinents qu'une liste sans fin à faire défiler.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-band">
+        <div class="wrap">
+          <h2>Prêt à savoir avec qui vous êtes vraiment compatible ?</h2>
+          <p>Le questionnaire prend environ 6 minutes.</p>
+          <button class="btn-primary" id="ctaStart">Commencer le questionnaire</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== AUTH ===================== -->
+    <section id="screen-auth" class="hidden">
+      <div class="wrap quiz-shell">
+        <div class="quiz-head">
+          <h2 id="authTitle">Créer un compte</h2>
+          <p id="authSubtitle">Pour recevoir des profils compatibles, commence par créer ton compte.</p>
+        </div>
+        <div class="question-card">
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="authTabEmail">Email</button>
+            <button class="auth-tab" id="authTabPhone">Téléphone</button>
+          </div>
+
+          <div id="authEmailForm" style="display:flex; flex-direction:column; gap:16px;">
+            <div class="field">
+              <label for="authEmail">Email</label>
+              <input type="email" id="authEmail" placeholder="vous@exemple.com" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="authPassword">Mot de passe</label>
+              <input type="password" id="authPassword" placeholder="8 caractères minimum" autocomplete="current-password">
+            </div>
+            <p class="form-error" id="authError"></p>
+            <button class="btn-primary" id="authSubmit" style="width:100%;">Créer mon compte</button>
+            <button class="btn-plain form-note" id="authToggle">J'ai déjà un compte, me connecter</button>
+          </div>
+
+          <div id="authPhoneForm" class="hidden" style="display:flex; flex-direction:column; gap:16px;">
+            <div class="field">
+              <label for="authPhone">Numéro de téléphone</label>
+              <input type="tel" id="authPhone" placeholder="+253 77 XX XX XX" autocomplete="tel">
+            </div>
+            <p class="form-error" id="phoneError"></p>
+            <button class="btn-primary" id="sendOtpBtn" style="width:100%;">Recevoir le code par SMS</button>
+
+            <div class="field hidden" id="otpInputWrap">
+              <label for="authOtp">Code reçu par SMS</label>
+              <input type="text" id="authOtp" placeholder="123456" inputmode="numeric">
+            </div>
+            <button class="btn-primary hidden" id="verifyOtpBtn" style="width:100%;">Vérifier le code</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PROFILE INFO ===================== -->
+    <section id="screen-profile-info" class="hidden">
+      <div class="wrap quiz-shell">
+        <div class="quiz-head">
+          <h2>Votre profil</h2>
+          <p>Ces informations seront visibles par les profils compatibles, une fois votre compte vérifié.</p>
+        </div>
+        <div class="question-card">
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="field">
+              <label for="piName">Prénom</label>
+              <input type="text" id="piName" placeholder="Votre prénom">
+            </div>
+            <div class="field">
+              <label for="piAge">Âge</label>
+              <input type="number" id="piAge" placeholder="Votre âge" min="18" max="90">
+            </div>
+            <div class="field">
+              <label for="piCity">Ville</label>
+              <input type="text" id="piCity" placeholder="Djibouti-ville, Tadjourah...">
+            </div>
+            <div class="field">
+              <label for="piJob">Profession</label>
+              <input type="text" id="piJob" placeholder="Votre métier">
+            </div>
+            <div class="field">
+              <label for="piBio">Courte présentation</label>
+              <textarea id="piBio" placeholder="Quelques lignes sur vous, ce que vous recherchez..."></textarea>
+            </div>
+            <p class="form-error" id="profileInfoError"></p>
+            <button class="btn-primary" id="profileInfoSubmit" style="width:100%;">Continuer vers le questionnaire</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== QUIZ ===================== -->
+    <section id="screen-quiz" class="hidden">
+      <div class="wrap quiz-shell">
+        <div class="quiz-head">
+          <h2>Questionnaire de compatibilité</h2>
+          <p>Répondez selon ce qui vous correspond vraiment aujourd'hui, pas ce qui semble le mieux paraître.</p>
+        </div>
+
+        <div class="progress-label" id="progressLabel">Question 1 / 12</div>
+        <div class="progress-track" id="progressTrack"></div>
+
+        <div id="quizCategory" class="cat-tag"></div>
+
+        <div class="question-card">
+          <h3 id="questionText"></h3>
+          <div class="options" id="optionsList"></div>
+        </div>
+
+        <div class="quiz-nav">
+          <button class="btn-plain" id="btnBack">← Retour</button>
+          <button class="btn-primary" id="btnNext" disabled>Continuer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RESULTS ===================== -->
+    <section id="screen-results" class="hidden">
+      <div class="wrap-wide results-shell">
+        <div class="results-head">
+          <h2>Vos profils compatibles</h2>
+          <p>Classés selon la compatibilité de vos réponses avec les leurs.</p>
+        </div>
+        <div class="match-grid" id="matchGrid"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site">
+    <div class="wrap-wide footer-row">
+      <span>Qoys — plateforme de mise en relation en vue du mariage</span>
+      <span>Profils fictifs à titre de démonstration</span>
+    </div>
+  </footer>
+
+</div>
+
+<div id="modalRoot"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------------------------------------------------------------
+// Data: quiz questions grouped by compatibility domain
+// ---------------------------------------------------------------
+const BASE_QUESTIONS = [
+  { cat: "Valeurs & mode de vie", key: "religion", text: "Quelle place la pratique religieuse tient-elle dans votre quotidien ?",
+    options: [
+      {v:"tres_religieux", l:"Très religieux·se"},
+      {v:"salafiste", l:"Salafiste"},
+      {v:"cinq_prieres", l:"Je fais mes 5 prières"},
+      {v:"croyant_non_pratiquant", l:"Croyant·e mais non pratiquant·e"},
+    ]},
+  { cat: "Valeurs & mode de vie", key: "ville", text: "Où vous projetez-vous après le mariage ?",
+    options: [
+      {v:"djibouti", l:"À Djibouti-ville"},
+      {v:"regions", l:"Dans une autre région du pays"},
+      {v:"etranger", l:"À l'étranger, si l'occasion se présente"},
+      {v:"ouvert", l:"Je n'ai pas de préférence fixe"},
+    ]},
+  { cat: "Valeurs & mode de vie", key: "argent", text: "Comment voyez-vous la gestion de l'argent au sein du couple ?",
+    options: [
+      {v:"commun", l:"Tout en commun, un budget partagé"},
+      {v:"mixte", l:"Un compte commun et une part personnelle"},
+      {v:"separe", l:"Des finances plutôt séparées"},
+      {v:"a_definir", l:"À construire ensemble selon la situation"},
+    ]},
+  { cat: "Valeurs & mode de vie", key: "travail_conjoint", text: "Qu'attendez-vous concernant le travail de votre futur·e conjoint·e ?",
+    options: [
+      {v:"encourage", l:"Je souhaite qu'iel travaille et s'épanouisse professionnellement"},
+      {v:"selon_choix", l:"Selon son choix, sans pression dans un sens ou l'autre"},
+      {v:"foyer_prio", l:"Je préférerais que le foyer soit la priorité"},
+      {v:"peu_importe", l:"Peu importe, tant qu'on est d'accord ensemble"},
+    ]},
+
+  { cat: "Situation personnelle", key: "statut_marital", text: "Quelle est votre situation matrimoniale actuelle ?",
+    options: [
+      {v:"jamais_marie", l:"Jamais marié·e"},
+      {v:"divorce", l:"Divorcé·e"},
+      {v:"veuf", l:"Veuf / veuve"},
+      {v:"separe", l:"Séparé·e, procédure en cours"},
+    ]},
+  { cat: "Situation personnelle", key: "revenu", text: "Quel est votre revenu mensuel approximatif (en FDJ) ?",
+    options: [
+      {v:"r1", l:"Entre 50 000 et 150 000"},
+      {v:"r2", l:"Entre 150 000 et 300 000"},
+      {v:"r3", l:"Entre 300 000 et 600 000"},
+      {v:"r4", l:"Entre 600 000 et 1 000 000, ou plus"},
+    ]},
+  { cat: "Situation personnelle", key: "logement_situation", text: "Concernant le logement, où en êtes-vous aujourd'hui ?",
+    options: [
+      {v:"jai_logement", l:"J'ai déjà mon propre logement"},
+      {v:"veux_louer", l:"Je compte louer un logement après le mariage"},
+      {v:"chez_parents", l:"Je vis actuellement chez mes parents"},
+      {v:"a_construire", l:"C'est encore à construire selon les moyens du couple"},
+    ]},
+
+  { cat: "Habitudes de vie", key: "caractere", text: "Comment vous décririez-vous au quotidien ?",
+    options: [
+      {v:"introverti", l:"Plutôt introverti·e, je me ressource seul·e"},
+      {v:"extraverti", l:"Plutôt extraverti·e, je me ressource avec les autres"},
+      {v:"entre_deux", l:"Un peu des deux, selon les moments"},
+    ]},
+  { cat: "Habitudes de vie", key: "consommation", text: "Concernant le khat, le tabac ou l'alcool, quelle est votre situation ?",
+    options: [
+      {v:"rien", l:"Aucun des trois"},
+      {v:"khat_seul", l:"Je consomme du khat, rien d'autre"},
+      {v:"khat_tabac", l:"Je consomme du khat et je fume"},
+      {v:"alcool", l:"Je bois de l'alcool à l'occasion"},
+      {v:"tout", l:"Khat, tabac et alcool"},
+    ]},
+
+  { cat: "Projet de mariage", key: "ceremonie", text: "Quel type de cérémonie de mariage envisagez-vous ?",
+    options: [
+      {v:"grande", l:"Une grande cérémonie, avec beaucoup d'invités"},
+      {v:"intermediaire", l:"Une cérémonie de taille moyenne"},
+      {v:"simple", l:"Quelque chose de simple, en petit comité"},
+      {v:"peu_importe", l:"Peu importe, ce n'est pas ce qui compte le plus pour moi"},
+    ]},
+  { cat: "Projet de mariage", key: "delai_engagement", text: "D'ici combien de temps êtes-vous prêt·e à vous engager dans le mariage ?",
+    options: [
+      {v:"moins_6mois", l:"Moins de 6 mois"},
+      {v:"six_un_an", l:"Entre 6 mois et 1 an"},
+      {v:"plus_un_an", l:"Plus d'un an"},
+    ]},
+
+  { cat: "Famille & avenir", key: "enfants", text: "Combien d'enfants envisagez-vous, idéalement ?",
+    options: [
+      {v:"aucun", l:"Aucun, ou pas de préférence marquée"},
+      {v:"un_deux", l:"Un ou deux"},
+      {v:"plusieurs", l:"Trois ou plus"},
+      {v:"a_voir", l:"Je préfère en discuter le moment venu"},
+    ]},
+  { cat: "Famille & avenir", key: "famille_elargie", text: "Quelle place la famille élargie doit-elle avoir dans votre futur foyer ?",
+    options: [
+      {v:"tres_presente", l:"Très présente, on se voit très régulièrement"},
+      {v:"presente", l:"Présente, avec des visites fréquentes"},
+      {v:"moderee", l:"Modérée, surtout pour les occasions importantes"},
+      {v:"distante", l:"Plutôt distante, chacun son foyer"},
+    ]},
+  { cat: "Famille & avenir", key: "logement", text: "Après le mariage, vous imaginez plutôt :",
+    options: [
+      {v:"chez_famille", l:"Vivre proche de la famille, voire avec elle au départ"},
+      {v:"logement_seul", l:"Un logement indépendant dès le début"},
+      {v:"selon_moyens", l:"Selon les moyens disponibles au moment venu"},
+      {v:"peu_importe", l:"Peu importe, le lieu compte moins que la relation"},
+    ]},
+  { cat: "Famille & avenir", key: "education", text: "Sur l'éducation des enfants, vous êtes plutôt :",
+    options: [
+      {v:"stricte", l:"Un cadre clair et assez strict"},
+      {v:"equilibree", l:"Un cadre ferme mais souple selon les situations"},
+      {v:"souple", l:"Beaucoup de liberté encadrée par le dialogue"},
+      {v:"a_deux", l:"À construire à deux, sans idée arrêtée"},
+    ]},
+  { cat: "Famille & avenir", key: "parents_cohabitation", text: "Vos parents vivront-ils avec vous après le mariage ?",
+    options: [
+      {v:"oui", l:"Oui, ils vivront avec nous"},
+      {v:"non", l:"Non, ils ne vivront pas avec nous"},
+      {v:"temporaire", l:"Temporairement, le temps de s'installer"},
+      {v:"a_voir", l:"À voir selon les circonstances"},
+    ]},
+  { cat: "Famille & avenir", key: "tribu_importance", text: "Quelle importance accordez-vous à la tribu dans le choix du/de la conjoint·e ?",
+    options: [
+      {v:"tres_important", l:"Très important, c'est un critère central"},
+      {v:"assez_important", l:"Assez important, sans être déterminant"},
+      {v:"peu_important", l:"Peu important pour moi"},
+      {v:"pas_important", l:"Pas important du tout"},
+    ]},
+
+  { cat: "Caractère & communication", key: "conflit", text: "Face à un désaccord dans le couple, vous avez tendance à :",
+    options: [
+      {v:"parler_direct", l:"En parler tout de suite, cash mais respectueux"},
+      {v:"prendre_recul", l:"Prendre un peu de recul avant d'en discuter"},
+      {v:"eviter", l:"Éviter le sujet pour préserver la paix"},
+      {v:"mediation", l:"Passer par un proche ou une figure d'autorité familiale"},
+    ]},
+  { cat: "Caractère & communication", key: "energie", text: "Comment décririez-vous votre énergie sociale ?",
+    options: [
+      {v:"tres_sociable", l:"Très sociable, j'aime recevoir et sortir souvent"},
+      {v:"equilibre", l:"Un bon équilibre entre sorties et calme à la maison"},
+      {v:"plutot_calme", l:"Plutôt calme, je préfère les petits cercles"},
+      {v:"reserve", l:"Réservé·e, j'ai besoin de beaucoup de temps seul·e"},
+    ]},
+  { cat: "Caractère & communication", key: "ambition", text: "Qu'est-ce qui vous décrit le mieux dans votre rapport au travail ?",
+    options: [
+      {v:"tres_ambitieux", l:"Très ambitieux·se, le travail est central pour moi"},
+      {v:"equilibre_travail", l:"Investi·e, mais la vie de famille passe avant"},
+      {v:"stable", l:"Je cherche surtout la stabilité, sans grande ambition particulière"},
+      {v:"flexible", l:"Ça dépend beaucoup des périodes de la vie"},
+    ]},
+  { cat: "Caractère & communication", key: "temps_libre", text: "Un dimanche idéal ressemble plutôt à :",
+    options: [
+      {v:"famille", l:"Un moment en famille ou entre proches"},
+      {v:"sport_plein_air", l:"Du sport ou une sortie en plein air"},
+      {v:"maison_calme", l:"Une journée tranquille à la maison"},
+      {v:"decouverte", l:"Une sortie culturelle ou une découverte"},
+    ]},
+];
+
+// Première question posée à tout le monde : détermine quelles questions
+// spécifiques (homme / femme) seront insérées ensuite.
+const GENDER_QUESTION =
+  { cat: "À propos de vous", key: "genre", text: "Vous répondez à ce questionnaire en tant que :",
+    options: [
+      {v:"homme", l:"Homme"},
+      {v:"femme", l:"Femme"},
+    ]};
+
+// Questions posées uniquement aux hommes
+const MALE_QUESTIONS = [
+  { cat: "Vision du mariage", key: "mahr_budget", text: "Quel budget envisagez-vous pour la dot (mahr) ?",
+    options: [
+      {v:"modeste", l:"Un montant modeste, symbolique"},
+      {v:"moyen", l:"Un montant moyen"},
+      {v:"important", l:"Un montant important"},
+      {v:"a_discuter", l:"À discuter selon la famille"},
+    ]},
+  { cat: "Vision du mariage", key: "polygamie", text: "Envisageriez-vous la polygamie dans votre mariage ?",
+    options: [
+      {v:"oui", l:"Oui, c'est envisageable pour moi"},
+      {v:"non", l:"Non, je ne l'envisage pas"},
+      {v:"peut_etre", l:"Peut-être, selon les circonstances"},
+    ]},
+];
+
+// Questions posées uniquement aux femmes
+const FEMALE_QUESTIONS = [
+  { cat: "Vision du mariage", key: "mahr_attente", text: "Quelle est votre attente concernant la dot (mahr) ?",
+    options: [
+      {v:"symbolique", l:"Un montant symbolique me suffit"},
+      {v:"moyenne", l:"Un montant moyen"},
+      {v:"importante", l:"Un montant important"},
+      {v:"peu_importe", l:"Peu importe le montant"},
+    ]},
+  { cat: "Vision du mariage", key: "polygamie_accept", text: "Accepteriez-vous un mariage polygame ?",
+    options: [
+      {v:"oui", l:"Oui, je l'accepterais"},
+      {v:"non", l:"Non, je ne l'accepterais pas"},
+      {v:"selon_circonstances", l:"Selon les circonstances"},
+    ]},
+];
+
+// Liste active du questionnaire : commence par la question de genre,
+// puis se complète automatiquement une fois la réponse donnée.
+let QUESTIONS = [GENDER_QUESTION, ...BASE_QUESTIONS];
+let genderQuestionsInserted = false;
+
+
+// ---------------------------------------------------------------
+// Supabase
+// ---------------------------------------------------------------
+const SUPABASE_URL = "https://dmegukoqobakhcyxaxvc.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_DoJ7_cM4s4yTEpgfCXyCHg_9fuCYnkD";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let authMode = "signup"; // "signup" | "login" (email channel only)
+
+// ---------------------------------------------------------------
+// State
+// ---------------------------------------------------------------
+let currentQuestion = 0;
+const userAnswers = {};
+
+// ---------------------------------------------------------------
+// Screen switching
+// ---------------------------------------------------------------
+function showScreen(id){
+  ["screen-landing","screen-auth","screen-profile-info","screen-quiz","screen-results"].forEach(s=>{
+    document.getElementById(s).classList.toggle("hidden", s!==id);
+  });
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function startQuiz(){
+  currentQuestion = 0;
+  QUESTIONS = [GENDER_QUESTION, ...BASE_QUESTIONS];
+  genderQuestionsInserted = false;
+  Object.keys(userAnswers).forEach(k => delete userAnswers[k]);
+  showScreen("screen-quiz");
+  renderQuestion();
+}
+
+// ---------------------------------------------------------------
+// Entry point: landing buttons check session first
+// ---------------------------------------------------------------
+async function handleStartClick(){
+  const { data: { session } } = await sb.auth.getSession();
+  if(session){
+    currentUser = session.user;
+    await proceedAfterAuth();
+  } else {
+    showScreen("screen-auth");
+  }
+}
+
+document.getElementById("navCta").addEventListener("click", handleStartClick);
+document.getElementById("heroStart").addEventListener("click", handleStartClick);
+document.getElementById("ctaStart").addEventListener("click", handleStartClick);
+document.getElementById("heroHow").addEventListener("click", ()=>{
+  document.getElementById("how").scrollIntoView({behavior:"smooth"});
+});
+
+// ---------------------------------------------------------------
+// Auth: tabs (email / téléphone)
+// ---------------------------------------------------------------
+function switchAuthTab(channel){
+  document.getElementById("authTabEmail").classList.toggle("active", channel==="email");
+  document.getElementById("authTabPhone").classList.toggle("active", channel==="phone");
+  document.getElementById("authEmailForm").classList.toggle("hidden", channel!=="email");
+  document.getElementById("authPhoneForm").classList.toggle("hidden", channel!=="phone");
+}
+document.getElementById("authTabEmail").addEventListener("click", ()=> switchAuthTab("email"));
+document.getElementById("authTabPhone").addEventListener("click", ()=> switchAuthTab("phone"));
+
+// ---------------------------------------------------------------
+// Auth: email + mot de passe (inscription / connexion)
+// ---------------------------------------------------------------
+document.getElementById("authToggle").addEventListener("click", ()=>{
+  authMode = authMode === "signup" ? "login" : "signup";
+  document.getElementById("authTitle").textContent = authMode === "signup" ? "Créer un compte" : "Se connecter";
+  document.getElementById("authSubmit").textContent = authMode === "signup" ? "Créer mon compte" : "Se connecter";
+  document.getElementById("authToggle").textContent = authMode === "signup" ? "J'ai déjà un compte, me connecter" : "Créer un nouveau compte";
+});
+
+document.getElementById("authSubmit").addEventListener("click", async ()=>{
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+  const errEl = document.getElementById("authError");
+  errEl.style.display = "none";
+
+  if(!email || !password){
+    errEl.textContent = "Merci de remplir l'email et le mot de passe.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const result = authMode === "signup"
+    ? await sb.auth.signUp({ email, password })
+    : await sb.auth.signInWithPassword({ email, password });
+
+  if(result.error){
+    errEl.textContent = result.error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  if(!result.data.user){
+    errEl.textContent = "Vérifiez votre boîte mail pour confirmer votre compte, puis reconnectez-vous.";
+    errEl.style.display = "block";
+    return;
+  }
+  currentUser = result.data.user;
+  await proceedAfterAuth();
+});
+
+// ---------------------------------------------------------------
+// Auth: téléphone (code envoyé par SMS)
+// ---------------------------------------------------------------
+document.getElementById("sendOtpBtn").addEventListener("click", async ()=>{
+  const phone = document.getElementById("authPhone").value.trim();
+  const errEl = document.getElementById("phoneError");
+  errEl.style.display = "none";
+
+  if(!phone){
+    errEl.textContent = "Merci d'indiquer un numéro de téléphone (avec l'indicatif, ex: +253...).";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const { error } = await sb.auth.signInWithOtp({ phone });
+  if(error){
+    errEl.textContent = error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  document.getElementById("otpInputWrap").classList.remove("hidden");
+  document.getElementById("verifyOtpBtn").classList.remove("hidden");
+  document.getElementById("sendOtpBtn").textContent = "Renvoyer le code";
+});
+
+document.getElementById("verifyOtpBtn").addEventListener("click", async ()=>{
+  const phone = document.getElementById("authPhone").value.trim();
+  const token = document.getElementById("authOtp").value.trim();
+  const errEl = document.getElementById("phoneError");
+  errEl.style.display = "none";
+
+  if(!token){
+    errEl.textContent = "Merci de saisir le code reçu par SMS.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const { data, error } = await sb.auth.verifyOtp({ phone, token, type: "sms" });
+  if(error){
+    errEl.textContent = error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  currentUser = data.user;
+  await proceedAfterAuth();
+});
+
+// ---------------------------------------------------------------
+// Après authentification : vérifie si le profil existe déjà
+// ---------------------------------------------------------------
+async function proceedAfterAuth(){
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .maybeSingle();
+
+  if(existing && existing.answers && Object.keys(existing.answers).length > 0){
+    Object.assign(userAnswers, existing.answers);
+    await computeResultsFromSupabase();
+    showScreen("screen-results");
+    return;
+  }
+
+  if(existing && existing.name){
+    document.getElementById("piName").value = existing.name || "";
+    document.getElementById("piAge").value = existing.age || "";
+    document.getElementById("piCity").value = existing.city || "";
+    document.getElementById("piJob").value = existing.job || "";
+    document.getElementById("piBio").value = existing.bio || "";
+  }
+  showScreen("screen-profile-info");
+}
+
+// ---------------------------------------------------------------
+// Formulaire d'informations de profil
+// ---------------------------------------------------------------
+document.getElementById("profileInfoSubmit").addEventListener("click", async ()=>{
+  const name = document.getElementById("piName").value.trim();
+  const age = parseInt(document.getElementById("piAge").value, 10);
+  const city = document.getElementById("piCity").value.trim();
+  const job = document.getElementById("piJob").value.trim();
+  const bio = document.getElementById("piBio").value.trim();
+  const errEl = document.getElementById("profileInfoError");
+  errEl.style.display = "none";
+
+  if(!name || !age || !city){
+    errEl.textContent = "Merci de remplir au moins le prénom, l'âge et la ville.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const { error } = await sb.from("profiles").upsert({
+    id: currentUser.id, name, age, city, job, bio
+  });
+  if(error){
+    errEl.textContent = "Erreur lors de l'enregistrement : " + error.message;
+    errEl.style.display = "block";
+    return;
+  }
+  startQuiz();
+});
+
+// ---------------------------------------------------------------
+// Quiz rendering
+// ---------------------------------------------------------------
+function renderProgress(){
+  const track = document.getElementById("progressTrack");
+  track.innerHTML = "";
+  QUESTIONS.forEach((_, i)=>{
+    const seg = document.createElement("div");
+    seg.className = "progress-seg";
+    const fill = document.createElement("i");
+    fill.style.width = i < currentQuestion ? "100%" : (i===currentQuestion ? "50%" : "0%");
+    seg.appendChild(fill);
+    track.appendChild(seg);
+  });
+  document.getElementById("progressLabel").textContent =
+    "Question " + (currentQuestion+1) + " / " + QUESTIONS.length;
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[currentQuestion];
+  renderProgress();
+  document.getElementById("quizCategory").textContent = q.cat;
+  document.getElementById("questionText").textContent = q.text;
+
+  const list = document.getElementById("optionsList");
+  list.innerHTML = "";
+  q.options.forEach((opt, idx)=>{
+    const row = document.createElement("div");
+    row.className = "option" + (userAnswers[q.key]===opt.v ? " selected" : "");
+    row.innerHTML = `
+      <input type="radio" name="q_${q.key}" id="opt_${idx}" ${userAnswers[q.key]===opt.v?"checked":""}>
+      <label for="opt_${idx}">${opt.l}</label>
+    `;
+    row.addEventListener("click", ()=>{
+      userAnswers[q.key] = opt.v;
+      renderQuestion();
+    });
+    list.appendChild(row);
+  });
+
+  document.getElementById("btnBack").style.visibility = currentQuestion===0 ? "hidden" : "visible";
+  document.getElementById("btnNext").disabled = !userAnswers[q.key];
+  document.getElementById("btnNext").textContent =
+    currentQuestion === QUESTIONS.length-1 ? "Voir mes profils compatibles" : "Continuer";
+}
+
+document.getElementById("btnBack").addEventListener("click", ()=>{
+  if(currentQuestion>0){ currentQuestion--; renderQuestion(); }
+});
+
+document.getElementById("btnNext").addEventListener("click", async ()=>{
+  const q = QUESTIONS[currentQuestion];
+  if(q.key === "genre" && !genderQuestionsInserted){
+    const specific = userAnswers.genre === "homme" ? MALE_QUESTIONS : FEMALE_QUESTIONS;
+    QUESTIONS.splice(currentQuestion + 1, 0, ...specific);
+    genderQuestionsInserted = true;
+  }
+  if(currentQuestion < QUESTIONS.length-1){
+    currentQuestion++;
+    renderQuestion();
+  } else {
+    const btn = document.getElementById("btnNext");
+    btn.disabled = true;
+    btn.textContent = "Enregistrement...";
+    await sb.from("profiles").update({
+      gender: userAnswers.genre,
+      answers: userAnswers,
+      status: "pending"
+    }).eq("id", currentUser.id);
+    await computeResultsFromSupabase();
+    showScreen("screen-results");
+  }
+});
+
+// ---------------------------------------------------------------
+// Matching logic
+// ---------------------------------------------------------------
+const EXCLUDED_FROM_DIRECT_MATCH = ["genre", "mahr_budget", "polygamie", "mahr_attente", "polygamie_accept"];
+
+const MAHR_MALE_TO_FEMALE = { modeste:"symbolique", moyen:"moyenne", important:"importante", a_discuter:"peu_importe" };
+const MAHR_FEMALE_TO_MALE = { symbolique:"modeste", moyenne:"moyen", importante:"important", peu_importe:"a_discuter" };
+const POLY_MALE_TO_FEMALE = { oui:"oui", non:"non", peut_etre:"selon_circonstances" };
+const POLY_FEMALE_TO_MALE = { oui:"oui", non:"non", selon_circonstances:"peut_etre" };
+
+function crossGenderCompat(userAns, candAns){
+  let matched = 0, total = 0;
+  const extraTraits = [];
+  if(userAns.genre === "homme"){
+    if(userAns.mahr_budget && candAns.mahr_attente){
+      total++;
+      if(MAHR_MALE_TO_FEMALE[userAns.mahr_budget] === candAns.mahr_attente){ matched++; extraTraits.push("Vision compatible de la dot (mahr)"); }
+    }
+    if(userAns.polygamie && candAns.polygamie_accept){
+      total++;
+      if(POLY_MALE_TO_FEMALE[userAns.polygamie] === candAns.polygamie_accept){ matched++; extraTraits.push("Position alignée sur la polygamie"); }
+    }
+  } else if(userAns.genre === "femme"){
+    if(userAns.mahr_attente && candAns.mahr_budget){
+      total++;
+      if(MAHR_FEMALE_TO_MALE[userAns.mahr_attente] === candAns.mahr_budget){ matched++; extraTraits.push("Vision compatible de la dot (mahr)"); }
+    }
+    if(userAns.polygamie_accept && candAns.polygamie){
+      total++;
+      if(POLY_FEMALE_TO_MALE[userAns.polygamie_accept] === candAns.polygamie){ matched++; extraTraits.push("Position alignée sur la polygamie"); }
+    }
+  }
+  return { matched, total, extraTraits };
+}
+
+function compatibility(userAns, candAns){
+  const keys = Object.keys(userAns).filter(k => !EXCLUDED_FROM_DIRECT_MATCH.includes(k));
+  let matched = 0;
+  const sharedTraitKeys = [];
+  keys.forEach(k=>{
+    if(userAns[k] === candAns[k]){
+      matched++;
+      sharedTraitKeys.push(k);
+    }
+  });
+  const cross = crossGenderCompat(userAns, candAns);
+  matched += cross.matched;
+  const total = keys.length + cross.total;
+  const pct = total > 0 ? Math.round((matched/total)*100) : 0;
+  const traitLabels = sharedTraitKeys.map(k=>TRAIT_LABELS[k]).concat(cross.extraTraits);
+  return { pct, traitLabels };
+}
+
+const TRAIT_LABELS = {
+  religion: "Rapport similaire à la pratique religieuse",
+  ville: "Même vision du lieu de vie",
+  argent: "Même approche de la gestion financière",
+  travail_conjoint: "Même attente sur le travail du/de la conjoint·e",
+  statut_marital: "Situation matrimoniale similaire",
+  revenu: "Niveau de revenu proche",
+  logement_situation: "Même situation de logement",
+  caractere: "Caractère compatible (introverti/extraverti)",
+  consommation: "Mêmes habitudes concernant khat, tabac et alcool",
+  ceremonie: "Même vision de la cérémonie de mariage",
+  delai_engagement: "Même délai souhaité avant de s'engager",
+  enfants: "Même souhait sur le nombre d'enfants",
+  famille_elargie: "Même place donnée à la famille élargie",
+  logement: "Même vision du logement",
+  education: "Même style d'éducation envisagé",
+  parents_cohabitation: "Même avis sur la cohabitation avec les parents",
+  tribu_importance: "Même importance accordée à la tribu",
+  conflit: "Même façon de gérer les désaccords",
+  energie: "Énergie sociale compatible",
+  ambition: "Rapport au travail similaire",
+  temps_libre: "Mêmes goûts pour le temps libre",
+};
+
+async function computeResultsFromSupabase(){
+  const grid = document.getElementById("matchGrid");
+  grid.innerHTML = `<p style="color:var(--text-soft); grid-column: 1/-1;">Chargement des profils compatibles...</p>`;
+
+  const oppositeGender = userAnswers.genre === "homme" ? "femme" : "homme";
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("gender", oppositeGender)
+    .eq("status", "approved")
+    .neq("id", currentUser.id);
+
+  grid.innerHTML = "";
+
+  if(error){
+    grid.innerHTML = `<div class="empty-state">Une erreur est survenue pendant le chargement des profils.</div>`;
+    return;
+  }
+
+  if(!data || data.length === 0){
+    grid.innerHTML = `<div class="empty-state">Votre profil est enregistré et en cours de vérification. Aucun profil compatible n'est encore disponible — revenez bientôt.</div>`;
+    return;
+  }
+
+  const scored = data.map(c=>{
+    const {pct, traitLabels} = compatibility(userAnswers, c.answers || {});
+    return {...c, pct, traitLabels};
+  }).sort((a,b)=> b.pct - a.pct);
+
+  scored.forEach(c=>{
+    const card = document.createElement("div");
+    card.className = "match-card";
+    const initials = c.name.slice(0,1);
+    const topTraits = c.traitLabels.slice(0,3);
+
+    card.innerHTML = `
+      <div class="match-top">
+        <div class="avatar">${initials}</div>
+        <div>
+          <p class="match-name">${c.name}, ${c.age}</p>
+          <p class="match-meta">${c.job || ""} · ${c.city || ""}</p>
+        </div>
+        <div class="match-score"><b>${c.pct}%</b><span>compatibilité</span></div>
+      </div>
+      <div class="score-bar"><i style="width:${c.pct}%"></i></div>
+      <div class="tag-row">
+        ${topTraits.map(t=>`<span class="tag">${t}</span>`).join("")}
+      </div>
+    `;
+    card.addEventListener("click", ()=> openDetail(c));
+    grid.appendChild(card);
+  });
+}
+
+// ---------------------------------------------------------------
+// Detail modal
+// ---------------------------------------------------------------
+function openDetail(c){
+  const root = document.getElementById("modalRoot");
+  const topTraits = c.traitLabels;
+  root.innerHTML = `
+    <div class="overlay" id="overlay">
+      <div class="modal">
+        <div class="modal-top">
+          <div>
+            <h3>${c.name}, ${c.age}</h3>
+            <p class="match-meta">${c.job} · ${c.city}</p>
+          </div>
+          <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="score-bar" style="margin-bottom:22px;"><i style="width:${c.pct}%"></i></div>
+        <div class="modal-section">
+          <h4>${c.pct}% de compatibilité</h4>
+          <p>${c.bio}</p>
+        </div>
+        <div class="modal-section">
+          <h4>Points communs identifiés</h4>
+          <div class="tag-row">${topTraits.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        </div>
+        <button class="btn-primary" style="width:100%; margin-top:8px;" id="sendRequest">Envoyer une demande de mise en relation</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("modalClose").addEventListener("click", closeDetail);
+  document.getElementById("overlay").addEventListener("click", (e)=>{
+    if(e.target.id === "overlay") closeDetail();
+  });
+  document.getElementById("sendRequest").addEventListener("click", async ()=>{
+    closeDetail();
+    const { error } = await sb.from("match_requests").insert({
+      sender_id: currentUser.id,
+      receiver_id: c.id
+    });
+    if(error){
+      showToast("Erreur lors de l'envoi de la demande.");
+    } else {
+      showToast("Demande envoyée à " + c.name);
+    }
+  });
+}
+function closeDetail(){
+  document.getElementById("modalRoot").innerHTML = "";
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=> t.classList.remove("show"), 2600);
+}
+</script>
+</body>
+</html>
